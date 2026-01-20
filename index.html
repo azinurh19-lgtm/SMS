@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Login</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+*{
+  box-sizing:border-box;
+  font-family: "Segoe UI", Arial, sans-serif;
+  margin:0;
+  padding:0;
+}
+
+body{
+  height:100vh;
+  background: radial-gradient(circle at top, #0d1b4c, #020817);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  color:#fff;
+}
+
+/* ===== Card ===== */
+.card{
+  width:90%;
+  max-width:360px;
+  background: linear-gradient(180deg, #081a44, #06122f);
+  border-radius:22px;
+  padding:28px 22px 30px;
+  box-shadow:0 0 40px rgba(0,0,0,.7);
+}
+
+/* ===== Title ===== */
+.title{
+  text-align:center;
+  font-size:26px;
+  font-weight:800;
+  color:#ff2a2a;
+  margin-bottom:10px;
+}
+
+.subtitle{
+  text-align:center;
+  font-size:14px;
+  color:#c7d2ff;
+  margin-bottom:25px;
+}
+
+.label{
+  font-size:14px;
+  margin-bottom:6px;
+}
+
+.inputBox{
+  background:#071437;
+  border-radius:14px;
+  padding:14px;
+  margin-bottom:20px;
+}
+
+.inputBox input{
+  width:100%;
+  background:transparent;
+  border:none;
+  outline:none;
+  color:#fff;
+  font-size:16px;
+  text-align:center;
+  letter-spacing:4px;
+}
+
+.btn{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:16px;
+  background: linear-gradient(90deg,#38bdf8,#4fc3ff);
+  color:#021027;
+  font-size:17px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+/* hide screen */
+.hidden{display:none;}
+
+/* toast */
+.toast{
+  position: fixed;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background:#000;
+  padding:12px 20px;
+  border-radius:10px;
+  opacity:0;
+  transition:.3s;
+}
+.toast.show{opacity:1;}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN SCREEN -->
+<div class="card" id="loginScreen">
+  <div class="title">MY GIRLFRIEND</div>
+  <div class="subtitle">Enter phone number</div>
+
+  <div class="label">📱 Phone Number</div>
+  <div class="inputBox">
+    <input type="tel" id="phone" maxlength="10" placeholder="10 digit number">
+  </div>
+
+  <button class="btn" onclick="goToOtp()">Login</button>
+</div>
+
+<!-- OTP SCREEN -->
+<div class="card hidden" id="otpScreen">
+  <div class="title">OTP VERIFY</div>
+  <div class="subtitle">Auto verifying OTP</div>
+
+  <div class="label">🔒 OTP</div>
+  <div class="inputBox">
+    <input type="text" id="otp" readonly placeholder="------">
+  </div>
+
+  <button class="btn" onclick="verifyOtp()">Verify</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function showToast(msg){
+  const t = document.getElementById("toast");
+  t.innerText = msg;
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"),2000);
+}
+
+function goToOtp(){
+  const phone = document.getElementById("phone").value.trim();
+  if(phone.length !== 10 || isNaN(phone)){
+    showToast("Enter valid number");
+    return;
+  }
+
+  document.getElementById("loginScreen").classList.add("hidden");
+  document.getElementById("otpScreen").classList.remove("hidden");
+
+  setTimeout(()=>{
+    document.getElementById("otp").value = "******";
+  },2000);
+}
+
+function verifyOtp(){
+  localStorage.setItem("logged","yes");
+  window.location.href = "chatinglist.html";
+}
+</script>
+
+</body>
+</html>

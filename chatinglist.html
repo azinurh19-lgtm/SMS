@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Bangla Chat App</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
+body{background:#020c1b;color:#fff;height:100vh}
+.hidden{display:none}
+
+/* TOP BAR */
+.top{height:60px;display:flex;align-items:center;padding:0 14px;background:#0008;gap:10px;position:relative}
+.back{font-size:22px;cursor:pointer}
+.top h3{flex:1;display:flex;align-items:center;gap:8px;font-size:17px}
+.status-dot{width:10px;height:10px;border-radius:50%;background:green}
+
+/* 3 DOT MENU */
+.menu-btn{font-size:20px;cursor:pointer;padding:6px}
+.menu{position:absolute;top:55px;right:14px;background:#111;border-radius:8px;overflow:hidden;box-shadow:0 5px 15px #000}
+.menu div{padding:12px 18px;cursor:pointer;font-size:14px}
+.menu div:hover{background:#ff3b3b}
+
+/* CHAT LIST */
+.list{padding:10px}
+.item{display:flex;gap:12px;padding:10px;border-radius:10px;cursor:pointer}
+.item:hover{background:#ffffff15}
+.avatar{width:48px;height:48px;border-radius:50%;overflow:hidden}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.last{font-size:12px;opacity:.7}
+
+/* CHAT */
+.chat{height:calc(100vh - 60px);display:flex;flex-direction:column}
+.msgs{flex:1;padding:15px;overflow:auto;display:flex;flex-direction:column;gap:6px}
+.msg{max-width:75%;padding:10px 14px;border-radius:18px;font-size:14px;word-wrap:break-word}
+.me{background:#3fa9f5;margin-left:auto}
+.bot{background:#2a2a2a}
+
+/* INPUT */
+.input{display:flex;padding:10px;background:#0008;gap:8px}
+.input input{flex:1;padding:10px 14px;border:none;border-radius:25px;background:#1a1a1a;color:#fff}
+.input button{border:none;background:#3fa9f5;color:#fff;border-radius:50%;width:40px}
+
+/* TYPING */
+.typing{width:50px;height:20px;background:#2a2a2a;border-radius:12px;padding:5px;display:flex;gap:4px}
+.dot{width:6px;height:6px;background:#aaa;border-radius:50%;animation:blink 1.4s infinite}
+.dot:nth-child(2){animation-delay:.2s}
+.dot:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%{opacity:.2}20%{opacity:1}100%{opacity:.2}}
+</style>
+</head>
+
+<body>
+
+<!-- CHAT LIST -->
+<div id="listPage">
+  <div class="top"><h2>Chats</h2></div>
+  <div class="list" id="chatList"></div>
+</div>
+
+<!-- CHAT PAGE -->
+<div id="chatPage" class="hidden">
+  <div class="top">
+    <div class="back" onclick="goBack()">←</div>
+    <h3>
+      <img id="chatLogo" style="width:35px;height:35px;border-radius:50%">
+      <span id="chatUser"></span>
+      <span class="status-dot"></span>
+    </h3>
+
+    <!-- 3 DOT -->
+    <div class="menu-btn" onclick="toggleMenu()">⋮</div>
+    <div id="menu" class="menu hidden">
+      <div onclick="deleteChat()">Delete Chat</div>
+    </div>
+  </div>
+
+  <div class="chat">
+    <div class="msgs" id="msgs"></div>
+    <div class="input">
+      <input id="text" placeholder="Message..." onkeypress="if(event.key==='Enter')send()">
+      <button onclick="send()"><i class="fa fa-paper-plane"></i></button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SHEET_URL="https://script.google.com/macros/s/AKfycbz5pqrJFSQnpCR_C7_FOW79uPC0WfQevq4wGSYN9XN-QaFD_V-j_WDpXCkP283rdhQo/exec";
+
+const users=[
+ {n:"Ananya",i:"https://i.postimg.cc/N06yRNKG/Girlfriend_9.jpg"},
+ {n:"Sakshi",i:"https://i.postimg.cc/TYsWx58b/Girlfriend_8.jpg"},
+ {n:"Riya",i:"https://i.postimg.cc/SQDMZtDm/Girlfriend_7.jpg"},
+ {n:"Isha",i:"https://i.postimg.cc/nz1Dfdxk/Girlfriend_6.jpg"},
+ {n:"Megha",i:"https://i.postimg.cc/4N2p3Fcm/Girlfriend_5.png"},
+ {n:"Kavya",i:"https://i.postimg.cc/tgjQnD08/Girlfriend_4.jpg"},
+ {n:"Pooja",i:"https://i.postimg.cc/0jB16sx2/Girlfriend_3.jpg"},
+ {n:"Nisha",i:"https://i.postimg.cc/QxzjCpxP/Girlfriend_2.jpg"},
+ {n:"Tanvi",i:"https://i.postimg.cc/wMT9y2m4/Girlfriend_1.jpg"},
+ {n:"Diya",i:"https://i.postimg.cc/B6f662N4/GIRLFRIEND_1.jpg"}
+];
+
+let current=null;
+let chats=JSON.parse(localStorage.getItem("chats")||"{}");
+let brain={};
+
+users.forEach((u,i)=>{ if(!chats[i])chats[i]=[]; });
+renderList();
+loadBrain();
+
+/* LOAD BRAIN */
+async function loadBrain(){
+ brain={};
+ const r=await fetch(SHEET_URL);
+ const d=await r.json();
+ d.forEach(x=>{
+  const u=x.user.toLowerCase();
+  const k=x.key.toLowerCase();
+  if(!brain[u])brain[u]={};
+  brain[u][k]=x.reply;
+ });
+}
+
+/* CHAT LIST */
+function renderList(){
+ chatList.innerHTML="";
+ users.forEach((u,i)=>{
+  const last=chats[i].length?chats[i].slice(-1)[0].v:"";
+  chatList.innerHTML+=`
+  <div class="item" onclick="openChat(${i})">
+   <div class="avatar"><img src="${u.i}"></div>
+   <div><b>${u.n}</b><div class="last">${last}</div></div>
+  </div>`;
+ });
+}
+
+/* OPEN CHAT */
+function openChat(i){
+ current=i;
+ chatLogo.src=users[i].i;
+ chatUser.innerText=users[i].n;
+ listPage.classList.add("hidden");
+ chatPage.classList.remove("hidden");
+ renderMsgs();
+}
+
+/* BACK */
+function goBack(){
+ chatPage.classList.add("hidden");
+ listPage.classList.remove("hidden");
+}
+
+/* SEND */
+async function send(){
+ const t=text.value.trim();
+ if(!t)return;
+ chats[current].push({t:"me",v:t});
+ text.value="";
+ save();
+ renderMsgs();
+
+ const learn=parseLearn(t);
+ if(learn){
+  await fetch(SHEET_URL,{method:"POST",body:JSON.stringify(learn)});
+  await loadBrain();
+  return botReply("Sikh gaya ✅");
+ }
+
+ const u=users[current].n.toLowerCase();
+ const k=t.toLowerCase();
+ botReply(brain[u]?.[k]||"🤔 Samajh nahi aaya");
+}
+
+/* LEARN FORMAT */
+function parseLearn(t){
+ const a=t.trim().split(" ");
+ if(a[0].toLowerCase()!=="user" || a.length<5) return null;
+ a.shift();
+ const key=[];
+ while(a.length && !users.map(x=>x.n.toLowerCase()).includes(a[0].toLowerCase())){
+  key.push(a.shift());
+ }
+ const user=a.shift();
+ const reply=a.join(" ");
+ return {user,key:key.join(" "),reply};
+}
+
+/* BOT REPLY */
+function botReply(v){
+ const typing=document.createElement("div");
+ typing.className="typing";
+ typing.innerHTML='<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+ msgs.appendChild(typing);
+ msgs.scrollTop=999999;
+
+ setTimeout(()=>{
+  typing.remove();
+  chats[current].push({t:"bot",v});
+  save();
+  renderMsgs();
+ },2000);
+}
+
+/* RENDER */
+function renderMsgs(){
+ msgs.innerHTML="";
+ chats[current].forEach(m=>{
+  msgs.innerHTML+=`<div class="msg ${m.t}">${m.v}</div>`;
+ });
+ msgs.scrollTop=999999;
+}
+
+/* STORAGE */
+function save(){
+ localStorage.setItem("chats",JSON.stringify(chats));
+}
+
+/* MENU */
+function toggleMenu(){
+ menu.classList.toggle("hidden");
+}
+
+/* DELETE CHAT (LOCAL ONLY) */
+function deleteChat(){
+ if(!confirm("Delete this chat history?")) return;
+ chats[current]=[];
+ save();
+ renderMsgs();
+ menu.classList.add("hidden");
+}
+</script>
+
+</body>
+</html>
