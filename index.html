@@ -8,31 +8,47 @@
 <style>
 *{
   box-sizing:border-box;
-  font-family: "Segoe UI", Arial, sans-serif;
+  font-family:"Segoe UI",Arial,sans-serif;
   margin:0;
   padding:0;
 }
 
 body{
-  height:100vh;
-  background: radial-gradient(circle at top, #0d1b4c, #020817);
+  min-height:100vh;
+  background:radial-gradient(circle at top,#0d1b4c,#020817);
+  color:#fff;
+  display:flex;
+  flex-direction:column;
+}
+
+/* ===== TOP AD ===== */
+.ad-top{
+  width:100%;
+  display:flex;
+  justify-content:center;
+  background:#000;
+  padding:6px 0;
+}
+
+/* ===== CENTER WRAPPER ===== */
+.center-wrap{
+  flex:1;
   display:flex;
   justify-content:center;
   align-items:center;
-  color:#fff;
 }
 
 /* ===== Card ===== */
 .card{
   width:90%;
   max-width:360px;
-  background: linear-gradient(180deg, #081a44, #06122f);
+  background:linear-gradient(180deg,#081a44,#06122f);
   border-radius:22px;
   padding:28px 22px 30px;
   box-shadow:0 0 40px rgba(0,0,0,.7);
 }
 
-/* ===== Title ===== */
+/* ===== Text ===== */
 .title{
   text-align:center;
   font-size:26px;
@@ -76,22 +92,30 @@ body{
   padding:14px;
   border:none;
   border-radius:16px;
-  background: linear-gradient(90deg,#38bdf8,#4fc3ff);
+  background:linear-gradient(90deg,#38bdf8,#4fc3ff);
   color:#021027;
   font-size:17px;
   font-weight:700;
   cursor:pointer;
 }
 
-/* hide screen */
-.hidden{display:none;}
+.hidden{display:none}
+
+/* ===== BOTTOM AD ===== */
+.ad-bottom{
+  width:100%;
+  display:flex;
+  justify-content:center;
+  background:#000;
+  padding:6px 0;
+}
 
 /* toast */
 .toast{
-  position: fixed;
-  bottom: 40px;
-  left: 50%;
-  transform: translateX(-50%);
+  position:fixed;
+  bottom:80px;
+  left:50%;
+  transform:translateX(-50%);
   background:#000;
   padding:12px 20px;
   border-radius:10px;
@@ -104,60 +128,89 @@ body{
 
 <body>
 
-<!-- LOGIN SCREEN -->
-<div class="card" id="loginScreen">
-  <div class="title">MY GIRLFRIEND</div>
-  <div class="subtitle">Enter phone number</div>
-
-  <div class="label">📱 Phone Number</div>
-  <div class="inputBox">
-    <input type="tel" id="phone" maxlength="10" placeholder="10 digit number">
-  </div>
-
-  <button class="btn" onclick="goToOtp()">Login</button>
+<!-- TOP AD -->
+<div class="ad-top">
+<script>
+atOptions={
+  'key':'1b980858c33313b17f49d1c7129929eb',
+  'format':'iframe',
+  'height':50,
+  'width':320,
+  'params':{}
+};
+</script>
+<script src="https://www.highperformanceformat.com/1b980858c33313b17f49d1c7129929eb/invoke.js"></script>
 </div>
 
-<!-- OTP SCREEN -->
-<div class="card hidden" id="otpScreen">
-  <div class="title">OTP VERIFY</div>
-  <div class="subtitle">Auto verifying OTP</div>
+<!-- CENTER CONTENT -->
+<div class="center-wrap">
 
-  <div class="label">🔒 OTP</div>
-  <div class="inputBox">
-    <input type="text" id="otp" readonly placeholder="------">
+  <!-- LOGIN -->
+  <div class="card" id="loginScreen">
+    <div class="title">MY GIRLFRIEND</div>
+    <div class="subtitle">Enter phone number</div>
+
+    <div class="label">📱 Phone Number</div>
+    <div class="inputBox">
+      <input type="tel" id="phone" maxlength="10" placeholder="10 digit number">
+    </div>
+
+    <button class="btn" onclick="goToOtp()">Login</button>
   </div>
 
-  <button class="btn" onclick="verifyOtp()">Verify</button>
+  <!-- OTP -->
+  <div class="card hidden" id="otpScreen">
+    <div class="title">OTP VERIFY</div>
+    <div class="subtitle">Auto verifying OTP</div>
+
+    <div class="label">🔒 OTP</div>
+    <div class="inputBox">
+      <input type="text" id="otp" readonly placeholder="------">
+    </div>
+
+    <button class="btn" onclick="verifyOtp()">Verify</button>
+  </div>
+
+</div>
+
+<!-- BOTTOM AD -->
+<div class="ad-bottom">
+<script>
+atOptions={
+  'key':'1b980858c33313b17f49d1c7129929eb',
+  'format':'iframe',
+  'height':50,
+  'width':320,
+  'params':{}
+};
+</script>
+<script src="https://www.highperformanceformat.com/1b980858c33313b17f49d1c7129929eb/invoke.js"></script>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
 function showToast(msg){
-  const t = document.getElementById("toast");
-  t.innerText = msg;
+  const t=document.getElementById("toast");
+  t.innerText=msg;
   t.classList.add("show");
   setTimeout(()=>t.classList.remove("show"),2000);
 }
 
 function goToOtp(){
-  const phone = document.getElementById("phone").value.trim();
-  if(phone.length !== 10 || isNaN(phone)){
+  const phone=document.getElementById("phone").value.trim();
+  if(phone.length!==10 || isNaN(phone)){
     showToast("Enter valid number");
     return;
   }
-
   document.getElementById("loginScreen").classList.add("hidden");
   document.getElementById("otpScreen").classList.remove("hidden");
-
-  setTimeout(()=>{
-    document.getElementById("otp").value = "******";
-  },2000);
+  setTimeout(()=>{document.getElementById("otp").value="******"},2000);
 }
 
 function verifyOtp(){
   localStorage.setItem("logged","yes");
-  window.location.href = "chatinglist.html";
+  window.location.href="chatinglist.html";
 }
 </script>
 
