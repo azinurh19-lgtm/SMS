@@ -190,6 +190,11 @@ atOptions={
 <div class="toast" id="toast"></div>
 
 <script>
+/* ✅ AUTO LOGIN CHECK (NEW – no UI change) */
+if(localStorage.getItem("logged")==="yes"){
+  window.location.href="chatinglist.html";
+}
+
 function showToast(msg){
   const t=document.getElementById("toast");
   t.innerText=msg;
@@ -209,6 +214,7 @@ function goToOtp(){
 }
 
 function verifyOtp(){
+  /* ✅ SAVE LOGIN IN INTERNAL STORAGE */
   localStorage.setItem("logged","yes");
   window.location.href="chatinglist.html";
 }
