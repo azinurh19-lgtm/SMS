@@ -32,7 +32,7 @@ body{background:#020c1b;color:#fff;height:100vh}
 .last{font-size:12px;opacity:.7}
 
 /* CHAT */
-.chat{height:calc(100vh - 60px);display:flex;flex-direction:column}
+.chat{height:calc(100vh - 110px);display:flex;flex-direction:column} /* Adjusted for top ad */
 .msgs{flex:1;padding:15px;overflow:auto;display:flex;flex-direction:column;gap:6px}
 .msg{max-width:75%;padding:10px 14px;border-radius:18px;font-size:14px;word-wrap:break-word}
 .me{background:#3fa9f5;margin-left:auto}
@@ -49,6 +49,9 @@ body{background:#020c1b;color:#fff;height:100vh}
 .dot:nth-child(2){animation-delay:.2s}
 .dot:nth-child(3){animation-delay:.4s}
 @keyframes blink{0%{opacity:.2}20%{opacity:1}100%{opacity:.2}}
+
+/* TOP AD */
+.top-ad{width:100%;display:flex;justify-content:center;height:50px;margin-bottom:5px}
 </style>
 </head>
 
@@ -62,6 +65,10 @@ body{background:#020c1b;color:#fff;height:100vh}
 
 <!-- CHAT PAGE -->
 <div id="chatPage" class="hidden">
+
+  <!-- TOP AD -->
+  <div class="top-ad" id="topAdContainer"></div>
+
   <div class="top">
     <div class="back" onclick="goBack()">←</div>
     <h3>
@@ -122,6 +129,24 @@ async function loadBrain(){
   brain[u][k]=x.reply;
  });
 }
+
+/* INSERT TOP AD */
+const topAdContainer=document.getElementById("topAdContainer");
+const adScript=document.createElement("script");
+adScript.innerHTML=`
+  atOptions = {
+    'key' : '1b980858c33313b17f49d1c7129929eb',
+    'format' : 'iframe',
+    'height' : 50,
+    'width' : 320,
+    'params' : {}
+  };
+`;
+topAdContainer.appendChild(adScript);
+
+const adScript2=document.createElement("script");
+adScript2.src="https://www.highperformanceformat.com/1b980858c33313b17f49d1c7129929eb/invoke.js";
+topAdContainer.appendChild(adScript2);
 
 /* CHAT LIST */
 function renderList(){
